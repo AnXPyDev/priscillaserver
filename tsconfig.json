@@ -6,8 +6,12 @@
         "target": "esnext",
         "module": "CommonJS",
         "esModuleInterop": true,
+        "resolveJsonModule": true,
         "strict": true,
         "outDir": "./dist",
+        "plugins": [
+            { "transform": "typia/lib/transform" }
+        ],
         "paths": {
             "@/*": ["./src/*"]
         }

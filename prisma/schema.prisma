@@ -13,7 +13,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Session {
-  id Int @id
-  session_string String
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  password_hash String
+  password_salt String
+  last_login    DateTime @default(now())
+  rooms         Room[]
+}
+
+model Room {
+  id                   Int      @id @default(autoincrement())
+  name                 String
+  owner                User     @relation(fields: [userId], references: [id])
+  created              DateTime @default(now())
+  joinCode             String
+  client_configuration Json
+  clients              Client[]
+
+  userId Int
+}
+
+model Client {
+  id     Int              @id @default(autoincrement())
+  room   Room             @relation(fields: [roomId], references: [id])
+  name   String
+  joined DateTime?
+  left   DateTime?
+  events IntegrityEvent[]
+
+  roomId Int
+}
+
+model IntegrityEvent {
+  id     Int    @id @default(autoincrement())
+  client Client @relation(fields: [clientId], references: [id])
+  data   Json
+
+  clientId Int
 }
