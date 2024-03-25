@@ -54,6 +54,10 @@ export default abstract class ServerModule {
                     reply.send({ code: 0 });
                 }
             } catch (e) {
+                if (e instanceof Error) {
+                    this.server.instance.log.error(e, `Internal server error: ${e.message}`);
+                }
+
                 reject(12, "Internal server error");
             }
         });

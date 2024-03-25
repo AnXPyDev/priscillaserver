@@ -1,0 +1,54 @@
+{
+    "name": "priscillatest",
+    "clientConfiguration": {
+        "name": "Priscilla Secure Test",
+        "integrity": {
+            "modules": [
+                {
+                    "name": "vanguard",
+                    "configuration": {
+                        "features": {
+                            "foreground_window": true
+                        }
+                    }
+                },
+                {
+                    "name": "supervisor"
+                }
+            ]
+        },
+        "webprofiles": [
+            {
+                "name": "priscilla",
+                "whitelist": [
+                    ".*\\.fitped\\.eu",
+                    "cdn\\..*",
+                    "cdnjs\\..*",
+                    "fonts\\..*"
+                ],
+                "homepage": "https://priscilla.fitped.eu"
+            },
+            {
+                "name": "translator",
+                "whitelist": [
+                    "translate\\.google\\..*",
+                    "consent\\.google\\..*",
+                    ".*gstatic\\.*"
+                ],
+                "homepage": "https://translate.google.com"
+
+            }
+        ],
+        "applications": [
+            {
+                "name": "Priscilla",
+                "webprofile": "priscilla",
+                "start_open": true
+            },
+            {
+                "name": "Translator",
+                "webprofile": "translator"
+            }
+        ]
+    }
+}

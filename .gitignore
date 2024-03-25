@@ -3,3 +3,4 @@
 /prisma/migrations
 /server.log
 /dist
+**/*.cookie

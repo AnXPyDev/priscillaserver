@@ -1,6 +1,6 @@
 import { createIs } from "typia";
 import ServerModule, { RequestValidator } from "../ServerModule";
-import { Hash, Hmac, createHash, createHmac, randomBytes } from "crypto";
+import { Hash, Hmac, createHash, createHmac, randomBytes, randomUUID } from "crypto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 interface Auth {
@@ -48,8 +48,44 @@ export default class UserModule extends ServerModule {
     }
 
     override init() {
+        interface WatchConfig {
+            room_id: number
+        }
+
+        const watchTokens = new Map<string, WatchConfig>();
+
+        const watch_socks = this.server.socks.of("/watch");
         const db = this.server.db;
         const log = this.server.instance.log;
+        const events = this.server.events;
+
+        watch_socks.on("connection", async (socket) => {
+            const auth: { token?: string } = socket.handshake.auth;
+
+            if (!auth.token) {
+                socket.send("No token provided");
+                return socket.disconnect();
+            }
+
+            const conf = watchTokens.get(auth.token);
+
+            if (!conf) {
+                socket.send("Invalid token");
+                return socket.disconnect()
+            }
+
+            const signal = `ROOM:${conf.room_id}`;
+
+            const listener = async (name: string, ...args: any[]) => {
+                socket.emit("event", name, ...args);
+            }
+
+            events.on(signal, listener);
+
+            socket.on("disconnect", () => {
+                events.removeListener(signal, listener);
+            });
+        });
 
         this.handle("register", async (data, callback) => {
             interface Params {
@@ -165,11 +201,16 @@ export default class UserModule extends ServerModule {
             const auth: Auth = data.auth;
 
             const params: {
-                name?: string
+                name?: string,
+                config?: string
             } = data.body;
 
             if (!params.name) {
                 return callback.reject(1, "Missing name parameter");
+            }
+
+            if (!params.config) {
+                return callback.reject(1, "Missing config name parameter");
             }
 
             {
@@ -186,12 +227,26 @@ export default class UserModule extends ServerModule {
                 }
             }
 
+            {
+                const config = await db.roomConfiguration.findFirst({
+                    where: {
+                        name: params.config
+                    },
+                    select: {
+                        name: true
+                    }
+                });
+                if (!config) {
+                    return callback.reject(2, `Room configuration with name ${params.config} does not exist`);
+                }
+            }
+
             const room = await db.room.create({
                 data: {
                     name: params.name,
                     owner: { connect: { id: auth.user_id } },
                     joinCode: this.randomString(6),
-                    client_configuration: {}
+                    config: { connect: { name: params.config } }
                 }
             });
 
@@ -199,5 +254,76 @@ export default class UserModule extends ServerModule {
 
         }, { validators: [ Validators.loggedIn ] });
 
+        this.handle("addRoomConfig", async (data, callback) => {
+            interface Params {
+                name?: string,
+                clientConfiguration?: any
+            }
+
+            const params = data.body as Params;
+
+            if (!params.name) {
+                return callback.reject(1, "Need name parameter");
+            }
+
+            if (!params.clientConfiguration) {
+                return callback.reject(1, "Need clientConfiguration parameter");
+            }
+
+            {
+                const rc = await db.roomConfiguration.findFirst({ where: {name: params.name}, select: {name: true}});
+                if (rc) {
+                    return callback.reject(2, `Room configuration ${params.name} already exists`);
+                }
+            }
+
+            await db.roomConfiguration.create({
+                data: {
+                    name: params.name,
+                    clientConfiguration: params.clientConfiguration
+                }
+            });
+        }, { validators: [ Validators.loggedIn ] });
+
+        this.handle("watchRoom", async (data, callback) => {
+            interface Params {
+                id?: number
+            };
+
+            const params = data.body as Params;
+            const auth = data.auth as Auth;
+
+            if (params.id === undefined) {
+                return callback.reject(1, "Need id param");
+            }
+
+            const room = await db.room.findFirst({
+                where: {
+                    id: params.id
+                }
+            });
+            
+            if (!room) {
+                return callback.reject(2, "Room not found");
+            }
+
+            if (room.userId != auth.user_id) {
+                return callback.reject(2, "You do not have permissions to watch this room");
+            }
+
+
+            const token = randomUUID();
+            
+            const watchConfig: WatchConfig = {
+                room_id: room.id
+            };
+
+            watchTokens.set(token, watchConfig);
+
+            return callback.success({
+                watchToken: token
+            });
+
+        }, { validators: [ Validators.loggedIn ] });
     }
 }

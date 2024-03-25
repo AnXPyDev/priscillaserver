@@ -22,20 +22,28 @@ model User {
   rooms         Room[]
 }
 
-model Room {
-  id                   Int      @id @default(autoincrement())
-  name                 String
-  owner                User     @relation(fields: [userId], references: [id])
-  created              DateTime @default(now())
-  joinCode             String
-  client_configuration Json
-  clients              Client[]
+model RoomConfiguration {
+  name                String @id
+  clientConfiguration Json
+  rooms               Room[]
+}
 
-  userId Int
+model Room {
+  id       Int               @id @default(autoincrement())
+  name     String
+  owner    User              @relation(fields: [userId], references: [id])
+  created  DateTime          @default(now())
+  joinCode String
+  clients  Client[]
+  config   RoomConfiguration @relation(fields: [configName], references: [name])
+
+  userId     Int
+  configName String
 }
 
 model Client {
   id     Int              @id @default(autoincrement())
+  secret String  @unique
   room   Room             @relation(fields: [roomId], references: [id])
   name   String
   joined DateTime?
