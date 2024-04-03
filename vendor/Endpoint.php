@@ -3,6 +3,8 @@
 require_once "Response.php";
 
 abstract class Endpoint {
+    protected $data;
+
     function __construct() {
         $this->internal_handle();    
     }
@@ -10,6 +12,8 @@ abstract class Endpoint {
     abstract protected function handle();
 
     private function internal_handle() {
+        $this->data = json_decode(file_get_contents("php://input"), true);
+
         $response = null;
         try {
             $response = $this->handle();
@@ -19,6 +23,9 @@ abstract class Endpoint {
             error_log($e->getMessage());
             error_log($e->getTraceAsString());
             $response = new ResponseError("Internal server error", 999);
+        } catch (Throwable $t) {
+            error_log($t);
+            $response = new ResponseError("Internal server error", 998);
         }
 
         if (is_null($response)) {
