@@ -25,14 +25,16 @@ create table `session` (
 create table `room` (
     `id` int primary key auto_increment,
     `name` varchar(32) not null,
-    `access_code` varchar(16) not null,
+    `join_code` varchar(16) not null,
+    `watch_code` varchar(16) not null,
+    `config` json not null,
     
     `owner_id` int not null,
     foreign key (`owner_id`) references `user`(`id`)
 );
 
 create table `config` (
-    `name` varchar(32) unique,
+    `name` varchar(32) primary key,
     `data` json not null
 );
 
@@ -47,18 +49,25 @@ create table `client` (
 
 create table `client_event` (
     `id` int primary key auto_increment,
-    `created` datetime not null,
+    `created` datetime not null default now(),
     `data` json not null,
-
+    
     `client_id` int not null,
-    foreign key (`client_id`) references `client`(`id`)
+    `room_id` int not null,
+
+    foreign key (`client_id`) references `client`(`id`),
+    foreign key (`room_id`) references `room`(`id`)
+
 );
 
 create table `room_event` (
     `id` int primary key auto_increment,
-    `created` datetime not null,
+    `created` datetime not null default now(),
     `data` json not null,
 
+    `client_id` int,
     `room_id` int not null,
+
+    foreign key (`client_id`) references `client`(`id`),
     foreign key (`room_id`) references `room`(`id`)
 );

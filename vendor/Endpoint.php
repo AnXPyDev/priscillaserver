@@ -13,6 +13,9 @@ abstract class Endpoint {
 
     private function internal_handle() {
         $this->data = json_decode(file_get_contents("php://input"), true);
+        if (is_null($this->data)) {
+            $this->data = [];
+        }
 
         $response = null;
         try {

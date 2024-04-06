@@ -1,6 +1,7 @@
 <?php
 
 require_once "Database.php";
+require_once "Response.php";
 
 $auth = new class {
     function make_salt() {
@@ -46,5 +47,4 @@ $auth = new class {
 
         return $user;
     }
-
 };

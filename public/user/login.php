@@ -10,13 +10,13 @@ new class extends Endpoint {
         global $database;
         global $auth;
 
-        $data = $this->data;
-        if (is_null($data) || is_null($data["username"]) || is_null($data["password"])) {
+        $username = $this->data["username"] ?? null;
+        $password = $this->data["password"] ?? null;
+
+        if (any_null($username, $password)) {
             return new ResponseError("Bad input");
         }
 
-        $username = $data["username"];
-        $password = $data["password"];
 
         $db = $database->ensure();
 
