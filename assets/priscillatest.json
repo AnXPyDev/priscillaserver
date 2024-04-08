@@ -11,10 +11,7 @@
                 }
             },
             {
-                "name": "supervisor",
-                "configuration": {
-                    "backend": "http"
-                }
+                "name": "supervisor"
             }
         ]
     },

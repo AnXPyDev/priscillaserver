@@ -76,6 +76,8 @@ new class extends UserEndpoint {
         ]);
 
         return new ResponseSuccess([
+            'id' => $room_id,
+            'name' => $name,
             'join_code' => $join_code,
             'watch_code' => $watch_code
         ]);

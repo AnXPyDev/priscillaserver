@@ -36,6 +36,9 @@ abstract class Endpoint {
         }
         
         header("Content-Type: application/json");
+        header("Access-Control-Allow-Origin: *", false);
+        header("Access-Control-Allow-Headers: Content-Type", false);
+        header("Access-Control-Allow-Credentials: true", false);
         echo json_encode(array_merge(
             array("code" => $response->getCode()),
             $response->getData()

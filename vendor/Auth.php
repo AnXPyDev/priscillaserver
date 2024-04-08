@@ -47,4 +47,21 @@ $auth = new class {
 
         return $user;
     }
+
+    function get_client(string $secret) {
+        global $database;
+        
+        $db = $database->ensure();
+
+        $qry_get_client = $db->prepare('select * from `client` where `secret`=:secret');
+        $qry_get_client->execute([
+            ':secret' => $secret
+        ]);
+
+        if ($qry_get_client->rowCount() == 0) {
+            return null;
+        }
+
+        return $qry_get_client->fetch(PDO::FETCH_ASSOC);
+    }
 };

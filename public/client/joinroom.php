@@ -11,7 +11,7 @@ new class extends Endpoint {
         global $auth;
 
         $name = $this->data["name"] ?? null;
-        $join_code = $this->data["join_code"] ?? null;
+        $join_code = $this->data["joinCode"] ?? null;
 
         if (any_null($name, $join_code)) {
             return new ResponseError("Bad input");
@@ -50,8 +50,8 @@ new class extends Endpoint {
 
         return new ResponseSuccess([
             'secret' => $client_secret,
-            'name' => $room['name'],
-            'config' => $room['config']
+            'roomName' => $room['name'],
+            'clientConfiguration' => json_decode($room['config'], true)
         ]);
     }
 };

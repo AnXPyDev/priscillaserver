@@ -7,12 +7,7 @@ new class extends Endpoint {
     function handle() {
         return new ResponseSuccess([
             'supervisor' => [
-                'http' => true,
-                'sockets' => false
-            ],
-            'watcher' => [ 
-                'http' => true,
-                'sockets' => false
+                'protocol' => 'http'
             ]
         ]);
     }
