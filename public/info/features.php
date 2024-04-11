@@ -8,6 +8,9 @@ new class extends Endpoint {
         return new ResponseSuccess([
             'supervisor' => [
                 'protocol' => 'http'
+            ],
+            'requests' => [
+                'protocol' => 'http'
             ]
         ]);
     }

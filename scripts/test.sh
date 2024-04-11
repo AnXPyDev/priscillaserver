@@ -10,8 +10,6 @@ post_action user/info '{"session": "'$SESSION'"}'
 
 JOIN_CODE="$(post_action user/createroom '{"session": "'$SESSION'", "config": "priscillatest"}' | tee /dev/stderr | jq -r .join_code)"
 
-post_action user/logout '{"session": "'$SESSION'"}'
-post_action user/info '{"session": "'$SESSION'"}'
 
 post_action client/joinroom '{"name": "Jozef Komaromy", "join_code": "'"$JOIN_CODE"'"}'
 

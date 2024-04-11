@@ -1,3 +1,5 @@
+drop table if exists `reponse`;
+drop table if exists `request`;
 drop table if exists `room_event`;
 drop table if exists `client_event`;
 drop table if exists `client`;
@@ -70,4 +72,19 @@ create table `room_event` (
 
     foreign key (`client_id`) references `client`(`id`),
     foreign key (`room_id`) references `room`(`id`)
+);
+
+create table `request` (
+    `id` int primary key auto_increment,
+    `data` json not null,
+
+    `client_id` int not null ,
+    foreign key (`client_id`) references `client`(`id`)
+);
+
+create table `response` (
+    `request_id` int primary key,
+    `data` json not null,
+
+    foreign key (`request_id`) references `request`(`id`)
 );

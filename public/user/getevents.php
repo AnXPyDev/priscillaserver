@@ -68,10 +68,32 @@ new class extends UserEndpoint {
         ]);
 
         $response['room_events'] = $qry_get_room_events->fetchAll(PDO::FETCH_ASSOC);
-
+        
         skip_room_events:;
 
-        return new ResponseSuccess($response);
+        $last_request_id = $this->data['last_request_id'] ?? null;
+        if (is_null($last_request_id)) {
+            goto skip_requests;
+        }
 
+        $qry_get_requests = $db->prepare(
+            'select `request`.* from `request` join `client` on `request`.`client_id`=`client`.`id` '
+            . 'where `client`.`room_id`=:room_id' . ' and `request`.`id`>:last_id' . 
+            (is_null($client_id) ? '' : ' and `client`.`id`=:client_id')
+        );
+        $qry_get_room_events->execute(is_null($client_id) ? [
+            ':room_id' => $room['id'],
+            ':last_id' => $last_request_id
+        ] : [
+            ':room_id' => $room['id'],
+            ':client_id' => $client_id,
+            ':last_id' => $last_request_id
+        ]);
+
+        $response['requests'] = $qry_get_requests->fetchAll(PDO::FETCH_ASSOC);
+
+        skip_requests:;
+
+        return new ResponseSuccess($response);
     }
 };
