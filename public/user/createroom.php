@@ -34,8 +34,6 @@ new class extends UserEndpoint {
 
         $config_default = json_decode($row['data'], true);
 
-        error_log(var_export($config_default, true));
-
 
         $config = array_replace_recursive($config, $config_default);
 

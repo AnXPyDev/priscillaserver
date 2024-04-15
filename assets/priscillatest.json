@@ -11,7 +11,10 @@
                 }
             },
             {
-                "name": "supervisor"
+                "name": "supervisor",
+                "configuration": {
+                    "minimum_severity": 2
+                }
             }
         ]
     },

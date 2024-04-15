@@ -45,9 +45,6 @@ new class extends UserEndpoint {
             ':request_id' => $request_id,
             ':data' => json_encode($data)
         ]);
-
-        $event = new SyncEvent("Request" . $request_id);
-        $event->fire();
     }
 
 

@@ -4,4 +4,10 @@ ROOT="$(realpath .)"
 
 [ $MSYSTEM ] && ROOT="$(cygpath -m $ROOT)"
 
-prep -D "ROOT=$ROOT" -i httpd.tpl.conf -o httpd.conf
+LIB_EXT="so"
+
+[ "$OS" = "Windows_NT" ] && LIB_EXT="dll"
+
+export ROOT LIB_EXT;
+
+prep -i httpd.tpl.conf -o httpd.conf

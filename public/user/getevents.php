@@ -1,31 +1,16 @@
 <?php
 
-require_once "UserEndpoint.php";
+require_once "WatchEndpoint.php";
 require_once "Database.php";
 require_once "Response.php";
 
-new class extends UserEndpoint {
-    function handle_user() {
+new class extends WatchEndpoint {
+    function handle_room() {
         global $database;
-
-        $watch_code = $this->data['watch_code'] ?? null;
-
-        if (is_null($watch_code)) {
-            return new ResponseError("No watch code");
-        }
 
         $db = $database->ensure();
 
-        $qry_get_room = $db->prepare('select * from `room` where `watch_code`=:watch_code');
-        $qry_get_room->execute([
-            ':watch_code' => $watch_code
-        ]);
-
-        if ($qry_get_room->rowCount() == 0) {
-            return new ResponseError("Invalid watch code");
-        }
-
-        $room = $qry_get_room->fetch();
+        $room = $this->room;
 
         $response = [];
 
@@ -77,11 +62,12 @@ new class extends UserEndpoint {
         }
 
         $qry_get_requests = $db->prepare(
-            'select `request`.* from `request` join `client` on `request`.`client_id`=`client`.`id` '
-            . 'where `client`.`room_id`=:room_id' . ' and `request`.`id`>:last_id' . 
+            'select `request`.* from `request` join `client` on `request`.`client_id`=`client`.`id` left join `response` on `request`.`id`=`response`.`request_id`'
+            . 'where `response`.`data` is null and `client`.`room_id`=:room_id' . ' and `request`.`id`>:last_id' . 
             (is_null($client_id) ? '' : ' and `client`.`id`=:client_id')
         );
-        $qry_get_room_events->execute(is_null($client_id) ? [
+
+        $qry_get_requests->execute(is_null($client_id) ? [
             ':room_id' => $room['id'],
             ':last_id' => $last_request_id
         ] : [

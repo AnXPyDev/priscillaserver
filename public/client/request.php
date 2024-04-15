@@ -23,11 +23,13 @@ new class extends ClientEndpoint {
             ':data' => json_encode($data)
         ]);
 
-        $request_id = $db->lastInsertId();
+        $request_id = (int)$db->lastInsertId();
 
-        $event = new SyncEvent("Request" . $request_id);
-        $success = $event->wait($timeout);
+        return new ResponseSuccess([
+            'request_id' => $request_id
+        ]);
 
+        /*
         if (!$success) {
             return new ResponseError("Timed out");
         }
@@ -44,6 +46,7 @@ new class extends ClientEndpoint {
         $response = $qry_get_response->fetch(PDO::FETCH_ASSOC);
 
         return new ReponseSuccess($response);
+        */
         
     }
 };

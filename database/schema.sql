@@ -1,4 +1,5 @@
-drop table if exists `reponse`;
+drop table if exists `message`;
+drop table if exists `response`;
 drop table if exists `request`;
 drop table if exists `room_event`;
 drop table if exists `client_event`;
@@ -42,8 +43,10 @@ create table `config` (
 
 create table `client` (
     `id` int primary key auto_increment,
+    `ip_adress` varchar(32) not null,
     `name` varchar(32) not null,
     `secret` varchar(32) not null,
+    `state` json default '{}',
 
     `room_id` int not null,
     foreign key (`room_id`) references `room`(`id`)
@@ -88,3 +91,12 @@ create table `response` (
 
     foreign key (`request_id`) references `request`(`id`)
 );
+
+create table `message` (
+    `id` int primary key auto_increment,
+    `data` json not null,
+
+    `client_id` int not null,
+
+    foreign key (`client_id`) references `client`(`id`)
+)

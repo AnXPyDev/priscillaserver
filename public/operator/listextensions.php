@@ -6,12 +6,7 @@ require_once "Response.php";
 new class extends Endpoint {
     function handle() {
         return new ResponseSuccess([
-            'supervisor' => [
-                'protocol' => 'http'
-            ],
-            'requests' => [
-                'protocol' => 'http-refresh'
-            ]
+            "extensions" => get_loaded_extensions()
         ]);
     }
 };
