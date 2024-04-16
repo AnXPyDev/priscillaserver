@@ -33,12 +33,14 @@ new class extends Endpoint {
 
         $client_secret = $auth->make_random_string(12);
 
-        $qry_insert_client = $db->prepare('insert into `client` (`name`, `secret`, `room_id`, `ip_adress`) values (:name, :secret, :room_id, :ip_adress)');
+        $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown IP';
+
+        $qry_insert_client = $db->prepare('insert into `client` (`name`, `secret`, `room_id`, `ip_address`) values (:name, :secret, :room_id, :ip_address)');
         $qry_insert_client->execute([
             ':name' => $name,
             ':secret' => $client_secret,
             ':room_id' => $room['id'],
-            ':ip_adress' => $_SERVER['REMOTE_ADDR'] ?? 'unknown IP'
+            ':ip_address' => $ip_address
         ]);
 
         $qry_insert_event = $db->prepare('insert into `room_event` (`room_id`, `data`) values (:room_id, :data)');
