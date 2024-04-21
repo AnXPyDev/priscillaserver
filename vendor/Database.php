@@ -7,7 +7,14 @@ $database = new class {
 
     function connect() {
         global $config;
-        $this->con = new PDO($config['DATABASE_PROTO'] . ':host='. $config['DATABASE_HOST'] . ';' . 'dbname=' . $config['DATABASE_NAME'], $config['DATABASE_USER'], $config['DATABASE_PASSWORD']);
+        $this->con = new PDO(
+            $config['DATABASE_PROTO'] . 
+            ':host='. $config['DATABASE_HOST'] . 
+            ';port=' . $config['DATABASE_PORT'] .
+            ';dbname=' . $config['DATABASE_NAME'],
+            $config['DATABASE_USER'],
+            $config['DATABASE_PASSWORD']
+        );
     }
 
     function ensure() {

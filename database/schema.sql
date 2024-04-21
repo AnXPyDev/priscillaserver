@@ -43,10 +43,10 @@ create table `config` (
 
 create table `client` (
     `id` int primary key auto_increment,
-    `ip_adress` varchar(32) not null,
+    `ip_address` varchar(32) not null,
     `name` varchar(32) not null,
     `secret` varchar(32) not null,
-    `state` json default '{}',
+    `state` json default('{}'),
 
     `room_id` int not null,
     foreign key (`room_id`) references `room`(`id`)
@@ -54,7 +54,7 @@ create table `client` (
 
 create table `client_event` (
     `id` int primary key auto_increment,
-    `created` datetime not null default now(),
+    `created` datetime not null default(now()),
     `data` json not null,
     
     `client_id` int not null,
@@ -67,7 +67,7 @@ create table `client_event` (
 
 create table `room_event` (
     `id` int primary key auto_increment,
-    `created` datetime not null default now(),
+    `created` datetime not null default(now()),
     `data` json not null,
 
     `client_id` int,
