@@ -11,45 +11,16 @@ new class extends UserEndpoint {
         global $auth;
 
         $name = $this->data["name"] ?? $this->user['displayname'] . "'s room";
-        $config_name = $this->data["config"] ?? null;
-        $config_override = $this->data["config_override"] ?? null;
+        $config = $this->data["config"];
 
         $db = $database->ensure();
 
-        $config = [];
-
-        if (is_null($config_name)) {
-            goto skip_qry;
+        if (is_null($config)) {
+            return new ResponseError("No config provided");
         }
-
-        $qry_get_config = $db->prepare('select `data` from `config` where `name`=:name');
-        $qry_get_config->execute([':name' => $config_name]);
-
-        if ($qry_get_config->rowCount() == 0) {
-            return new ResponseError("No such config '$config_name'");
-        }
-
-        $row = $qry_get_config->fetch(PDO::FETCH_ASSOC);
-
-
-        $config_default = json_decode($row['data'], true);
-
-
-        $config = array_replace_recursive($config, $config_default);
-
-        skip_qry:;
-
-        if (is_null($config_override)) {
-            goto skip_override;
-        }
-
-        $config = array_replace_recursive($config, $config_override);
-
-        skip_override:;
 
         $join_code = $auth->make_random_string(6);
         $watch_code = $auth->make_random_string(12);
-        $config_json = json_encode($config);
         $owner_id = $this->user["id"];
 
         $qry_insert_room = $db->prepare('insert into `room` (`name`, `join_code`, `watch_code`, `config`, `owner_id`) values (:name, :join_code, :watch_code, :config, :owner_id)');
@@ -58,7 +29,7 @@ new class extends UserEndpoint {
             ':name' => $name,
             ':join_code' => $join_code,
             ':watch_code' => $watch_code,
-            ':config' => $config_json,
+            ':config' => $config,
             ':owner_id' => $owner_id
         ]);
 

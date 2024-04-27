@@ -9,7 +9,7 @@ new class extends Endpoint {
             'supervisor' => [
                 'protocol' => 'http'
             ],
-            'requests' => [
+            'messages' => [
                 'protocol' => 'http-refresh'
             ]
         ]);

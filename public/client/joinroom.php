@@ -54,7 +54,7 @@ new class extends Endpoint {
         return new ResponseSuccess([
             'secret' => $client_secret,
             'roomName' => $room['name'],
-            'clientConfiguration' => json_decode($room['config'], true)
+            'clientConfiguration' => $room['config']
         ]);
     }
 };
