@@ -1,5 +1,7 @@
 <?php
 
+include "../autoload.php";
+
 require_once "UserEndpoint.php";
 require_once "Database.php";
 require_once "Response.php";

@@ -1,5 +1,7 @@
 <?php
 
+include "../autoload.php";
+
 require_once "Endpoint.php";
 require_once "Database.php";
 
