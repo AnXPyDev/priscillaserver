@@ -11,7 +11,8 @@ new class extends Endpoint {
             ],
             'messages' => [
                 'protocol' => 'http-refresh'
-            ]
+            ],
+            'unifiedpush' => True
         ]);
     }
 };
